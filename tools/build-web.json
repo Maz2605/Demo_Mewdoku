@@ -1,0 +1,12 @@
+{
+  "name": "Meow Pop",
+  "platform": "web-mobile",
+  "buildPath": "project://build",
+  "outputName": "web-mobile",
+  "startScene": "2aac1c1e-1f5b-a1cc-cdab-be41534e9bc2",
+  "scenes": [{ "url": "db://assets/scenes/MeowPop.scene", "uuid": "2aac1c1e-1f5b-a1cc-cdab-be41534e9bc2" }],
+  "debug": true,
+  "md5Cache": false,
+  "mainBundleCompressionType": "merge_dep",
+  "packages": { "web-mobile": { "orientation": "auto" } }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "DemoMewdoku",
+  "uuid": "855b1597-37f8-4660-9c68-a3a18164e806",
+  "scripts": {
+    "test": "node tests/run.cjs",
+    "typecheck": "node tools/typecheck.cjs"
+  },
+  "creator": {
+    "version": "3.8.4"
+  }
+}

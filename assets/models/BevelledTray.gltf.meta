@@ -1,0 +1,93 @@
+{
+  "ver": "2.3.13",
+  "importer": "gltf",
+  "imported": true,
+  "uuid": "15bd8a23-7e76-480f-bbd0-4007a3c65a5d",
+  "files": [],
+  "subMetas": {
+    "a1840": {
+      "importer": "gltf-mesh",
+      "uuid": "15bd8a23-7e76-480f-bbd0-4007a3c65a5d@a1840",
+      "displayName": "",
+      "id": "a1840",
+      "name": "BevelledTray.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 768
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "20fdf": {
+      "importer": "gltf-material",
+      "uuid": "15bd8a23-7e76-480f-bbd0-4007a3c65a5d@20fdf",
+      "displayName": "",
+      "id": "20fdf",
+      "name": "GlossyToy.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "b602c": {
+      "importer": "gltf-scene",
+      "uuid": "15bd8a23-7e76-480f-bbd0-4007a3c65a5d@b602c",
+      "displayName": "",
+      "id": "b602c",
+      "name": "BevelledTray.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "15bd8a23-7e76-480f-bbd0-4007a3c65a5d@a1840"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [
+        "15bd8a23-7e76-480f-bbd0-4007a3c65a5d@20fdf"
+      ],
+      "scenes": [
+        "15bd8a23-7e76-480f-bbd0-4007a3c65a5d@b602c"
+      ]
+    }
+  }
+}
