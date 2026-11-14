@@ -1,6 +1,6 @@
-# Meow Pop — Canva visual skin
+# Meow Pop — 20 picture puzzles
 
-Cocos Creator **3.8.4**. Four fixed Vietnamese pixel-art puzzles (4×4, 5×5, 6×6, 8×8), each with one unique answer and a non-backtracking logical solution. Real 3D candy blocks sit inside a cream/lavender tray; sprite UI uses the orange kitten, golden logo, purple/gold controls and sky/cloud treatment from the approved Canva direction.
+Cocos Creator **3.8.8**. Twenty Vietnamese pixel-art puzzles (4×4–8×8), each with one unique answer and a non-backtracking logical solution. The board itself is the finished picture. Stone and threshold-lock cells introduce new deductions while retaining the original cat rules. Real 3D candy blocks sit inside a cream/lavender tray with the orange kitten, golden logo and sky/cloud skin.
 
 ## Run
 
@@ -9,7 +9,7 @@ Open `assets/scenes/MeowPop.scene` in Creator and Preview. The scene owns an ord
 Build Web Mobile:
 
 ```powershell
-& 'C:/ProgramData/cocos/editors/Creator/3.8.4/CocosCreator.exe' --project 'D:/Cocos/DemoMewdoku' --build 'configPath=D:/Cocos/DemoMewdoku/tools/build-web.json'
+& 'C:/ProgramData/cocos/editors/Creator/3.8.8/CocosCreator.exe' --project 'F:/Cocos/Demo_Mewdoku' --build 'configPath=F:/Cocos/Demo_Mewdoku/tools/build-web.json'
 node tools/serve.cjs
 ```
 
@@ -17,11 +17,14 @@ Open http://localhost:8088/ or http://127.0.0.1:8088/ through HTTP. The current 
 
 ## Play
 
+- Choose any of the 20 pictures at startup or use “Chọn tranh” in the header. Closing the menu resumes the board; choosing a card restarts that level. Checkmarks indicate pictures completed this session.
 - One cat per row, column and color; cats cannot touch, including diagonally. Disconnected cells of the same color share one region.
 - Tap to toggle ×. Hold an unmarked cell for 0.4 seconds to search. Movement >12 UI units or touch-cancel cancels the hold; one pointer owns input.
 - Correct searches exclude the row/column/color and neighbors. Blocks break in a wave; no gravity/refill. Three hearts; a repeated guess at the same wrong cell does not charge again.
 - Two hints per level explain a logical step and clear a wrong manual mark on the hinted cell; they never collect a cat automatically. Inspect shows A–H and highlights all cells of one color.
-- A completed board becomes the original flat picture. After 0.6 seconds, the result opens. “Xem tranh” hides it; tap the picture to reopen. Retry resets the current level.
+- Stones never contain cats and cannot be marked/searched. Locked cells retain their color; the number means the total cats required to open them. Blocked gestures cost nothing. Excluded locks reveal normally. The first stone/lock level explains its mechanic.
+- A completed board becomes its original flat picture. After the clean-picture pause, a full-screen outro presents that image in a large cream frame against purple, with a soft glow and brief reveal. It stays until you choose “Tranh tiếp theo” or “Chọn tranh”. Retry resets the current level.
+- Progress shows the current picture out of 20. The last outro celebrates the collection and offers restarting. Progress is session-only. Feature details and verification: `docs/GALLERY_OUTRO.md`.
 
 ## Visual architecture
 
@@ -39,12 +42,23 @@ Edit the GameRoot prefab in Creator for normal visual work. The offline generato
 
 ```powershell
 node tools/skin-assets.cjs
+node tools/picture-assets.cjs
 node tools/author-view.cjs
 ```
 
 `skin-assets` renders code-native SVG textures and normalizes generated PNGs using the bundled authoring-only Sharp module (`MEOW_SHARP` can override its location). `author-view` writes prefab/scene/material bindings while retaining existing asset UUIDs. `author-skin.cjs` delegates to the current texture authoring pipeline. `create-scene.cjs` delegates to author-view; prepare textures first.
 
-Keep puzzle data/palette unchanged for skin edits. Level authoring remains in `core/Levels.ts`; `tools/author-levels.cjs` can overwrite it and is not part of skin regeneration.
+Keep puzzle data/palette unchanged for skin edits. Frozen picture inputs live in `tools/data/pictures.json`; edit these deliberately when authoring a new picture. The tool never changes picture pixels to force a solution. Revise a draft if the independent solver rejects it.
+
+```powershell
+node tools/author-levels.cjs --check
+node tools/author-levels.cjs --preview
+node tools/author-levels.cjs --export
+node tools/picture-assets.cjs
+node tools/blocker-assets.cjs
+```
+
+Only `--export` writes runtime `core/Levels.ts` and `docs/level-validation.json`. Preview writes `docs/images/pictures.svg` and `.png`; running without arguments prints usage. Validation checks every reachable correct-cat subset, so locks cannot force guessing or trap a valid play order. After changing palettes or overlay bindings, deliberately run `author-view` to update authored materials/prefabs; it replaces authored layout customization.
 
 ## Verify
 
@@ -53,7 +67,7 @@ npm test
 npm run typecheck
 ```
 
-TypeScript comes from the installed Creator (`MEOW_TYPESCRIPT` override supported). Automated checks cover core rules, input, responsive geometry, prefab wiring/scene expansion, mesh/shard motion, late-puff lifetime and expression cancellation. They do not establish visual quality or device/network behavior. Current runtime evidence and limitations are in `docs/VERIFICATION.md`; approved work/ledger in `docs/superpowers/plans/2026-11-13-canva-visual.md`; art standard in `docs/visual/STYLE.md`.
+TypeScript and authoring templates resolve through `tools/toolchain.cjs` using the version in package.json (`MEOW_CREATOR` and `MEOW_TYPESCRIPT` overrides supported). Open the project in Creator first to generate `temp/tsconfig.cocos.json`; do not edit that generated file. Automated checks cover rules/blockers, all 20 pictures, immutable authoring, input, responsive geometry, prefab wiring/scene expansion, mesh/shard motion, particles and expression cancellation. They do not establish visual recognition or physical-device behavior. Latest feature evidence: `docs/PICTURE_LEVELS.md`; previous skin evidence: `docs/VERIFICATION.md`.
 
 
 For geometry edits, run `node tools/export-models.cjs` and let Creator import any new model before `node tools/author-view.cjs`. The current ColorPlane model/material references are already authored and imported; existing asset UUIDs were retained.

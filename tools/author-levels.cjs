@@ -1,39 +1,49 @@
-// Offline constrained pixel authoring. Deterministic seed; never runs in the game.
-const fs=require('node:fs');
-const ts=require('C:/ProgramData/cocos/editors/Creator/3.8.4/resources/app.asar.unpacked/node_modules/typescript');
-require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,f);
-const {logicalSolve}=require('../assets/scripts/core/Puzzle.ts');
-let seed=871245;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
-const pictures=[
- {id:'fish',title:'Cá nhỏ',palette:['#55C5DD','#FFAF42','#FFF0B3','#343956'],rows:['0010','0121','0113','0010']},
- {id:'paw',title:'Dấu chân',palette:['#79C9BA','#F5DFB5','#FF8FAD','#474276','#FFB24A'],rows:['01010','21212','00200','02320','04440']},
- {id:'kitten',title:'Mèo tinh nghịch',palette:['#79C9BA','#FFB24A','#E77936','#FFF0C9','#3A3654','#FF8FAD'],rows:['100001','121121','111111','141141','133331','013530']},
- {id:'ginger',title:'Mèo cam may mắn',palette:['#67C7D5','#FFB84C','#DD793C','#FFE4B3','#3B3956','#F791B1','#C8E7DD','#FFF8EE'],rows:['11000011','12100121','12211221','11111111','17411471','33355333','03333330','00633600']}
-];
-function permutations(n){const result=[],a=[];function go(){if(a.length===n){result.push(a.map((v,r)=>r*n+v));return;}for(let c=0;c<n;c++)if(!a.includes(c)&&(!a.length||Math.abs(c-a[a.length-1])>1)){a.push(c);go();a.pop();}}go();return result;}
-function count(cells,perms,limit=Infinity){let count=0,first;for(const p of perms){let bits=0,ok=true;for(const i of p){const bit=1<<cells[i];if(bits&bit){ok=false;break;}bits|=bit;}if(ok){first=p;count++;if(count>=limit)break;}}return {count,first};}
-const levels=[];
-for(const pic of pictures){
- const n=pic.rows.length,base=pic.rows.join('').split('').map(Number),perms=permutations(n);
- let best=null,bestScore=Infinity;
- for(let attempt=0;attempt<18000;attempt++){
-   const cats=perms[Math.floor(random()*perms.length)],cells=base.slice(),used=new Set(),duplicates=[];
-   for(const i of cats){if(used.has(cells[i]))duplicates.push(i);else used.add(cells[i]);}
-   const missing=Array.from({length:n},(_,i)=>i).filter(i=>!used.has(i));
-   for(const i of duplicates){const k=Math.floor(random()*missing.length);cells[i]=missing.splice(k,1)[0];}
-   // Extra small edits can remove alternative solutions, while preserving this one.
-   for(let k=0;k<Math.floor(attempt/4000);k++){
-     const i=Math.floor(random()*cells.length);if(!cats.includes(i))cells[i]=Math.floor(random()*n);
-   }
-   const score=cells.reduce((s,c,i)=>s+(c!==base[i]?1:0),0);
-   if(score>=bestScore)continue;
-   const answer=count(cells,perms,2);if(answer.count!==1)continue;
-   const level={id:pic.id,title:pic.title,size:n,palette:pic.palette,cells,cats:answer.first};
-   if(!logicalSolve(level).solved)continue;
-   best=level;bestScore=score;
-   if(!score)break;
+// Immutable pixel input -> independent answer validation -> explicit export.
+const fs=require('node:fs'),crypto=require('node:crypto');
+require('./toolchain.cjs').registerTypeScript();
+const {solveLevel,validatePlayableLevel}=require('../assets/scripts/core/Puzzle.ts');
+function buildCatalog(pictures){
+ const ids=new Set(),levels=[],reports=[];
+ for(const p of pictures){
+  if(ids.has(p.id))throw Error('Duplicate picture id: '+p.id);ids.add(p.id);
+  const n=p.rows.length;
+  if(p.rows.some(row=>row.length!==n||!/^[0-7]+$/.test(row)))throw Error(p.id+': invalid square pixel rows');
+  const level={id:p.id,title:p.title,size:n,palette:p.palette.slice(),cells:p.rows.join('').split('').map(Number),cats:[],...(p.blockers?.length?{blockers:p.blockers.map(b=>({...b}))}:{})};
+  const answers=solveLevel(level);
+  if(answers.length!==1)throw Error(p.id+': expected one solution, got '+answers.length);
+  level.cats=answers[0];
+  const report=validatePlayableLevel(level);
+  if(report.errors.length)throw Error(p.id+': '+report.errors.join('; '));
+  levels.push(level);reports.push({id:p.id,title:p.title,size:n,pixelHash:crypto.createHash('sha256').update(JSON.stringify({rows:p.rows,palette:p.palette})).digest('hex'),solutions:1,reachableStates:report.reachableStates,steps:report.steps});
  }
- if(!best)throw Error('Cannot author '+pic.id);
- levels.push(best);console.log(pic.id+': '+bestScore+' edited pixels; answer '+best.cats.join(','));
+ return {levels,reports};
 }
-fs.writeFileSync('assets/scripts/core/Levels.ts',"import { LevelDefinition } from './Puzzle';\n\n/** Authored pictures; same color may have disconnected islands. */\nexport const LEVELS: LevelDefinition[] = "+JSON.stringify(levels,null,2)+';\n');
+function contactSheet(levels){
+ const columns=5,w=1200,h=Math.ceil(levels.length/columns)*270+20;
+ let svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="#FFF8EE"/>`;
+ levels.forEach((l,k)=>{const x=k%columns*240+20,y=Math.floor(k/columns)*270+45,c=192/l.size;
+  svg+=`<text x="${x}" y="${y-14}" font-family="Arial" font-size="16" fill="#44305F">${k+1}. ${l.title}</text>`;
+  l.cells.forEach((v,i)=>svg+=`<rect x="${x+i%l.size*c}" y="${y+Math.floor(i/l.size)*c}" width="${c}" height="${c}" fill="${l.palette[v]}"/>`);
+  const stones=(l.blockers||[]).filter(b=>b.type==='stone').length,locks=(l.blockers||[]).filter(b=>b.type==='lock').length;
+  svg+=`<text x="${x}" y="${y+216}" font-family="Arial" font-size="13" fill="#7939CB">${l.size}×${l.size} · ${stones} đá · ${locks} khóa</text>`;
+ });return svg+'</svg>';
+}
+async function main(){
+ const args=process.argv.slice(2);
+ if(!args.length){console.log('Usage: node tools/author-levels.cjs --check | --preview | --export\nReads tools/data/pictures.json without changing its pixels. Only --export writes Levels.ts.');return;}
+ if(args.some(a=>!['--check','--preview','--export'].includes(a)))throw Error('Unknown authoring option');
+ const source=fs.readFileSync('tools/data/pictures.json','utf8'),{levels,reports}=buildCatalog(JSON.parse(source));
+ if(args.includes('--export')){
+  fs.writeFileSync('assets/scripts/core/Levels.ts',"import { LevelDefinition } from './Puzzle';\n\n/** Exported from immutable tools/data/pictures.json. Use author-levels --export. */\nexport const LEVELS: LevelDefinition[] = "+JSON.stringify(levels,null,2)+';\n');
+  fs.writeFileSync('docs/level-validation.json',JSON.stringify({creator:require('../package.json').creator.version,pictures:reports},null,2)+'\n');
+ }
+ if(args.includes('--preview')){
+  fs.mkdirSync('docs/images',{recursive:true});const svg=contactSheet(levels);fs.writeFileSync('docs/images/pictures.svg',svg);
+  const sharp=require(process.env.MEOW_SHARP||require('node:path').join(require('node:os').homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp'));
+  await sharp(Buffer.from(svg)).png().toFile('docs/images/pictures.png');
+ }
+ if(fs.readFileSync('tools/data/pictures.json','utf8')!==source)throw Error('Picture input was modified');
+ console.log(`${levels.length} pictures: unique answers, logical completion and all reachable correct subsets verified.`);
+}
+module.exports={buildCatalog,contactSheet};
+if(require.main===module)main().catch(e=>{console.error(e.message);process.exitCode=1;});

@@ -1,0 +1,733 @@
+{
+  "creator": "3.8.8",
+  "pictures": [
+    {
+      "id": "fish",
+      "title": "Cá nhỏ",
+      "size": 4,
+      "pixelHash": "90bfa6e3971e15858989fb7a4300dbe6761d80db8c58e2ae5b4b5ca3dab33eb1",
+      "solutions": 1,
+      "reachableStates": 16,
+      "steps": [
+        {
+          "index": 11,
+          "reason": "Màu D chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 2,
+          "reason": "Cột 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 4,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 13,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "heart",
+      "title": "Trái tim",
+      "size": 5,
+      "pixelHash": "2376b2f7bd3724ac1b7e21f46e9c605ee6335854ba99d661e474d0360f776eea",
+      "solutions": 1,
+      "reachableStates": 32,
+      "steps": [
+        {
+          "index": 8,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 10,
+          "reason": "Màu D chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 1,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 24,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 17,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "fishbone",
+      "title": "Xương cá",
+      "size": 5,
+      "pixelHash": "ecd95200a2b07a23f4e71798386e8ad45a76c8fcd2ad412f4b0c6656191fd28a",
+      "solutions": 1,
+      "reachableStates": 32,
+      "steps": [
+        {
+          "index": 24,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 13,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 2,
+          "reason": "Cột 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 5,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 16,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "paw",
+      "title": "Dấu chân",
+      "size": 5,
+      "pixelHash": "39fd68634215d1103c63d1c9f90faa64093560b8a78dd2653a464575ae9d5dd6",
+      "solutions": 1,
+      "reachableStates": 32,
+      "steps": [
+        {
+          "index": 17,
+          "reason": "Màu D chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 8,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 10,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 1,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 24,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "milk",
+      "title": "Hộp sữa",
+      "size": 6,
+      "pixelHash": "ec3972629a2001f746a50eb882cdf88151f6d5ee877185e7579b00eb3084b8dc",
+      "solutions": 1,
+      "reachableStates": 64,
+      "steps": [
+        {
+          "index": 27,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 8,
+          "reason": "Màu C chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 31,
+          "reason": "Màu D chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 16,
+          "reason": "Màu B chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 18,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 5,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "yarn",
+      "title": "Cuộn len",
+      "size": 6,
+      "pixelHash": "c2e19d590a8b5eec3495345dd3f66ba7201af2dee445d8986a4813fbd8fefc3c",
+      "solutions": 1,
+      "reachableStates": 64,
+      "steps": [
+        {
+          "index": 27,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 23,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 2,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 10,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 13,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 30,
+          "reason": "Hàng 6 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "kitten",
+      "title": "Mèo tinh nghịch",
+      "size": 6,
+      "pixelHash": "46b976404a177d1093e1b3613f574c4f230ef875956a82258ca8c3a38f430e19",
+      "solutions": 1,
+      "reachableStates": 64,
+      "steps": [
+        {
+          "index": 33,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 25,
+          "reason": "Màu D chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 22,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 2,
+          "reason": "Màu A chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 12,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 11,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "ginger",
+      "title": "Mèo cam may mắn",
+      "size": 8,
+      "pixelHash": "d793a7374b561f5384786b542b3c7e29406e81d0d3044cbf229d053f0e311928",
+      "solutions": 1,
+      "reachableStates": 256,
+      "steps": [
+        {
+          "index": 11,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 5,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 58,
+          "reason": "Hàng 8 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 38,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 17,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 28,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 40,
+          "reason": "Hàng 6 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 55,
+          "reason": "Hàng 7 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "bowl",
+      "title": "Bát ăn",
+      "size": 6,
+      "pixelHash": "6b9c69e9de9927b80ab4d9a0a217879bbbe2ca02201c0662683efa2cb6b32e9e",
+      "solutions": 1,
+      "reachableStates": 64,
+      "steps": [
+        {
+          "index": 9,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 13,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 22,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 24,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 5,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 32,
+          "reason": "Hàng 6 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "bow",
+      "title": "Nơ mèo",
+      "size": 6,
+      "pixelHash": "d7ee51e390a471134a1f2c0e86dc21834a31508e85f57ba30cac941a43af8128",
+      "solutions": 1,
+      "reachableStates": 64,
+      "steps": [
+        {
+          "index": 28,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 15,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 32,
+          "reason": "Cột 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 11,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 0,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 19,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "bell",
+      "title": "Chuông",
+      "size": 7,
+      "pixelHash": "936b0b390b138cf5ff4794af84958bb696a25ecfab181471a552584570f73c0f",
+      "solutions": 1,
+      "reachableStates": 128,
+      "steps": [
+        {
+          "index": 45,
+          "reason": "Màu G chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 41,
+          "reason": "Màu D chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 26,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 16,
+          "reason": "Màu C chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 11,
+          "reason": "Màu B chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 29,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 0,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "cookie",
+      "title": "Bánh quy",
+      "size": 7,
+      "pixelHash": "6e8a877123cff61fa4b777be0b08931381efc49716a051dad553979aefad3726",
+      "solutions": 1,
+      "reachableStates": 128,
+      "steps": [
+        {
+          "index": 38,
+          "reason": "Màu G chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 8,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 23,
+          "reason": "Cột 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 4,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 19,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 34,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 42,
+          "reason": "Hàng 7 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "gift",
+      "title": "Hộp quà",
+      "size": 6,
+      "pixelHash": "3f4a10d4cb64aa3512d3b17dc6ff2627499365e0539817a525c9c1e26fe2d4a2",
+      "solutions": 1,
+      "reachableStates": 63,
+      "steps": [
+        {
+          "index": 19,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 27,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 35,
+          "reason": "Hàng 6 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 0,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 8,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 16,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "basket",
+      "title": "Giỏ mèo",
+      "size": 7,
+      "pixelHash": "af41e56c7514ce6305ea579e67d2b79a9f06c7ecb94d6d0af6dc21f958742a51",
+      "solutions": 1,
+      "reachableStates": 127,
+      "steps": [
+        {
+          "index": 32,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 45,
+          "reason": "Hàng 7 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 36,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 27,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 9,
+          "reason": "Màu C chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 14,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 5,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "toyfish",
+      "title": "Cá đồ chơi",
+      "size": 8,
+      "pixelHash": "b75f9c9df2a1128decfff5dd7c2a0d3e58869c74c75e04e1c464e7f65cfde767",
+      "solutions": 1,
+      "reachableStates": 248,
+      "steps": [
+        {
+          "index": 52,
+          "reason": "Màu H chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 17,
+          "reason": "Màu G chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 47,
+          "reason": "Màu D chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 0,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 11,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 29,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 34,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 62,
+          "reason": "Hàng 8 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "sleepy",
+      "title": "Mèo ngủ",
+      "size": 8,
+      "pixelHash": "fb47c44421900eecc8aefa99d10b6949bce0bc2087b559debb2889db9864fe57",
+      "solutions": 1,
+      "reachableStates": 248,
+      "steps": [
+        {
+          "index": 35,
+          "reason": "Màu E chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 17,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 13,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 30,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 40,
+          "reason": "Hàng 6 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 50,
+          "reason": "Hàng 7 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 7,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 60,
+          "reason": "Hàng 8 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "house",
+      "title": "Nhà mèo",
+      "size": 8,
+      "pixelHash": "c3a7edb9ee4abf25b768ca661f2172471eab7e7de88cd996ef5652f4c2ece5f4",
+      "solutions": 1,
+      "reachableStates": 248,
+      "steps": [
+        {
+          "index": 22,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 39,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 57,
+          "reason": "Hàng 8 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 45,
+          "reason": "Cột 6 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 51,
+          "reason": "Hàng 7 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 28,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 10,
+          "reason": "Màu B chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 0,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "hug",
+      "title": "Mèo ôm len",
+      "size": 8,
+      "pixelHash": "7bf3dba1486453b4752bed4ed443265c115dbfea60f98bd924bf922d1744ee31",
+      "solutions": 1,
+      "reachableStates": 248,
+      "steps": [
+        {
+          "index": 42,
+          "reason": "Hàng 6 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 52,
+          "reason": "Hàng 7 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 27,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 62,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 7,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 9,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 21,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 32,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "crown",
+      "title": "Mèo vương miện",
+      "size": 8,
+      "pixelHash": "a27a16ad2c9fae99d705e1c8222f6a0bfdbfc9c37c3bd65b82faf5c82489900f",
+      "solutions": 1,
+      "reachableStates": 248,
+      "steps": [
+        {
+          "index": 40,
+          "reason": "Cột 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 38,
+          "reason": "Cột 7 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 23,
+          "reason": "Hàng 3 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 50,
+          "reason": "Hàng 7 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 60,
+          "reason": "Hàng 8 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 27,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 9,
+          "reason": "Màu F chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 5,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    },
+    {
+      "id": "twins",
+      "title": "Đôi mèo",
+      "size": 8,
+      "pixelHash": "4de7a7595e2ce500c15633aabc83f82c24135455ed2791f98910ec83925de120",
+      "solutions": 1,
+      "reachableStates": 248,
+      "steps": [
+        {
+          "index": 7,
+          "reason": "Hàng 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 16,
+          "reason": "Cột 1 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 62,
+          "reason": "Hàng 8 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 50,
+          "reason": "Hàng 7 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 45,
+          "reason": "Hàng 6 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 28,
+          "reason": "Hàng 4 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 11,
+          "reason": "Hàng 2 chỉ còn một ô có thể có mèo."
+        },
+        {
+          "index": 33,
+          "reason": "Hàng 5 chỉ còn một ô có thể có mèo."
+        }
+      ]
+    }
+  ]
+}

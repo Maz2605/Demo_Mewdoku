@@ -1,6 +1,6 @@
 import { _decorator, assetManager, Button, Canvas, Component, EventTouch, instantiate, isValid, Label, Node, Prefab, profiler, ResolutionPolicy, screen, Sprite, SpriteFrame, UIOpacity, tween, Tween, UITransform, Vec3, view, Widget } from 'cc';
 import { PREVIEW } from 'cc/env';
-import { Action, applyAction, createGame, GameState } from './core/Puzzle';
+import { Action, applyAction, cellAccess, createGame, GameState } from './core/Puzzle';
 import { LEVELS } from './core/Levels';
 import { DEFAULT_GAME_PREFAB_PATH, DEFAULT_GAME_PREFAB_UUID } from './core/DefaultAssets';
 import { HoldInput } from './core/HoldInput';
@@ -11,6 +11,8 @@ import { GameEffects } from './view/GameEffects';
 import { blastDuration } from './view/Motion';
 import { MascotView } from './view/MascotView';
 import { retireLegacyChildren } from './view/LegacyRoot';
+import { color } from './view/Ui';
+import { GalleryView } from './view/GalleryView';
 const { ccclass, property } = _decorator;
 
 /** State/controller with responsive layout, 3D destruction and Canva-style mascot. */
@@ -54,6 +56,15 @@ export class MeowGame extends Component {
     @property(MascotView) modalMascot: MascotView | null = null;
     @property(Node) tutorialRules: Node | null = null;
     @property(Node) modalGlow: Node | null = null;
+    @property(Node) pictureThumbnail: Node | null = null;
+    @property([Sprite]) thumbnailPixels: Sprite[] = [];
+    @property(GalleryView) gallery: GalleryView | null = null;
+    @property(Button) galleryButton: Button | null = null;
+    private completedPictures = new Set<number>();
+    private coreTutorialSeen = false;
+    private taughtStone = false;
+    private taughtLock = false;
+    private mechanicTutorial = false;
     private modalScale = 1;
     private resultCelebrated = false;
     private levelIndex = 0;
@@ -78,7 +89,7 @@ export class MeowGame extends Component {
     onLoad(): void {
         profiler.hideStats();
         view.enableRetina(true);
-        if (!this.board || !this.boardModel || this.cellViews.length !== 64 || !this.logo || !this.companion || this.heartSprites.length !== 3) {
+        if (!this.board || !this.boardModel || this.cellViews.length !== 64 || !this.logo || !this.companion || this.heartSprites.length !== 3 || !this.gallery || !this.galleryButton) {
             this.loadAuthoredRootForOldPreview();
             return;
         }
@@ -89,6 +100,10 @@ export class MeowGame extends Component {
         }
         this.ready = true;
         this.state = createGame(LEVELS[0]);
+        this.gallery.onChooseLevel = index => this.loadLevel(index);
+        this.gallery.onCloseMenu = () => this.resumeFromGallery();
+        this.gallery.onNext = () => this.loadLevel((this.levelIndex+1)%LEVELS.length);
+        this.gallery.onChooseMenu = () => this.onGallery();
         this.board.on(Node.EventType.TOUCH_START, this.touchStart, this);
         this.board.on(Node.EventType.TOUCH_MOVE, this.touchMove, this);
         this.board.on(Node.EventType.TOUCH_END, this.touchEnd, this);
@@ -98,19 +113,19 @@ export class MeowGame extends Component {
         if (this.boardModel) {
             this.boardModel.onTileBreak = (x, y, colorHex, isBorder, index) => {
                 this.effects?.poof(x, y, colorHex, isBorder);
-                this.cellViews[index].render(this.state.cells[index],false,this.inspecting,this.hinted===index||this.selectedColor===this.state.level.cells[index]);
+                this.renderCell(index,false,true);
             };
         }
 
         this.resize();
-        this.showTutorial();
+        this.onGallery();
     }
 
     /** Compatibility only: old running Editor snapshots may still hold the former empty Canvas. */
     private loadAuthoredRootForOldPreview(): void {
         const complete = (err: Error | null, prefab: Prefab) => {
             if (!isValid(this, true) || !isValid(this.node, true)) return;
-            if (err || !prefab?.data.getComponent(MeowGame)?.logo) {
+            if (err || !prefab?.data.getComponent(MeowGame)?.gallery) {
                 console.error('[MeowPop] Reopen MeowPop.scene: cannot load authored GameRoot.', err);
                 return;
             }
@@ -151,6 +166,7 @@ export class MeowGame extends Component {
         this.hold.cancel();
         this.locked = false;
         this.effects?.clear();
+        this.gallery?.settle();
         if (this.effects && this.board) { this.effects.node.setParent(this.board); this.effects.node.setPosition(0,0); }
         this.companion?.reset(); this.modalMascot?.reset();
         if (this.board) { Tween.stopAllByTarget(this.board); this.board.setPosition(this.baseBoardX,this.baseBoardY); }
@@ -209,7 +225,12 @@ export class MeowGame extends Component {
             this.baseBoardX=l.boardX;this.baseBoardY=l.boardY;this.boardSize=l.boardSize;
             this.board!.setPosition(l.boardX,l.boardY);this.setSize(this.board!,l.boardSize,l.boardSize);
             const shadow=this.board!.getChildByName('ContactShadow');if(shadow)this.setSize(shadow,l.boardSize+100,l.boardSize+100);
-            if(this.companion){const size=l.landscape?120:l.compact?78:124;this.setSize(this.companion.node,size,size);this.companion.node.setPosition(left+(l.landscape?210:255),l.logoY-(l.compact?0:8));}
+            if(this.companion){const size=l.landscape?120:l.compact?78:124;this.setSize(this.companion.node,size,size);this.companion.node.setPosition(Math.max(-w/2+size/2+16,left-(l.landscape?220:270)),l.logoY-(l.compact?0:8));}
+            this.setSize(this.galleryButton!.node,112,l.galleryHeight);
+            this.galleryButton!.node.setPosition(left+(l.landscape?210:270),l.galleryY);
+            const galleryLabel=this.galleryButton!.node.getChildByName('Label')?.getComponent(Label);
+            if(galleryLabel){galleryLabel.string='Chọn\ntranh';galleryLabel.fontSize=l.landscape?28:24;galleryLabel.lineHeight=l.landscape?34:28;this.setSize(galleryLabel.node,108,80);}
+            this.gallery!.layout(w,h);
             this.cloudLeft?.setPosition(-w/2+20,h/2-145);this.cloudRight?.setPosition(w/2-20,-h/2+105);
             const n=this.state.level.size,c=l.boardSize/n;
             this.cellViews.forEach((cell,i)=>{cell.resetMotion();cell.node.active=i<n*n;if(i>=n*n)return;cell.configure(c,this.state.level.palette[this.state.level.cells[i]],String.fromCharCode(65+this.state.level.cells[i]));cell.node.setPosition(-l.boardSize/2+(i%n+.5)*c,l.boardSize/2-(Math.floor(i/n)+.5)*c);});
@@ -232,22 +253,16 @@ export class MeowGame extends Component {
             this.setSize(this.modalPeek!,400,l.modalActionHeight);
             this.modalCard!.setScale(this.modalScale,this.modalScale,1);
             this.render();
-            if(this.state.status!=='playing'&&!this.peeking&&this.modalMode!=='tutorial')this.showResult();
+            if(this.state.status!=='playing'&&!this.peeking&&this.modalMode!=='tutorial'&&!this.gallery!.isOpen)this.showResult(false);
         } finally {this.resizing=false;}
     }
 
     private render(finished = this.state.status === 'won', defer: number[] = []): void {
         this.boardModel!.sync(this.state, defer, finished);
         for (let i = 0; i < this.state.cells.length; i++) {
-            this.cellViews[i].render(
-                this.state.cells[i],
-                finished,
-                this.inspecting,
-                this.hinted === i || this.selectedColor === this.state.level.cells[i],
-                !defer.includes(i)
-            );
+            this.renderCell(i,finished,!defer.includes(i));
         }
-        this.levelLabel!.string = `Màn ${this.levelIndex + 1} · ${this.state.level.title}`;
+        this.levelLabel!.string = `${this.levelIndex + 1}/${LEVELS.length} · ${this.state.level.title}`;
         this.catsLabel!.string = `${this.state.found.length} / ${this.state.level.size}`;
         this.heartsLabel!.string = '';
         this.heartSprites.forEach((s,i)=>s.spriteFrame=i<this.state.hearts?this.heartFull:this.heartEmpty);
@@ -259,8 +274,14 @@ export class MeowGame extends Component {
         this.colorButton!.interactable = this.state.status === 'playing' && !this.locked;
     }
 
+    private renderCell(index: number, finished: boolean, revealed: boolean): void {
+        this.cellViews[index].render(this.state.cells[index],finished,this.inspecting,
+            this.hinted===index||this.selectedColor===this.state.level.cells[index],revealed,
+            this.state.level.blockers?.find(b=>b.index===index),this.state.found.length);
+    }
+
     private canPlay(): boolean {
-        return this.ready && this.enabledInHierarchy && !this.locked && !this.modalRoot!.active && this.state.status === 'playing';
+        return this.ready && this.enabledInHierarchy && !this.locked && !this.modalRoot!.active && !this.gallery!.isOpen && this.state.status === 'playing';
     }
 
     private point(event: EventTouch): { x: number; y: number; index: number } {
@@ -281,6 +302,11 @@ export class MeowGame extends Component {
         if (this.inspecting) {
             this.selectedColor = this.state.level.cells[p.index];
             this.render();
+            return;
+        }
+        const access=cellAccess(this.state,p.index);
+        if(access!=='open'){
+            this.messageLabel!.string=access==='stone'?'Ô đá không có mèo.':`Tìm đủ ${this.state.level.blockers!.find(b=>b.index===p.index&&b.type==='lock')!['unlockAfter']} mèo để mở khóa.`;
             return;
         }
         const state = this.state.cells[p.index];
@@ -326,6 +352,7 @@ export class MeowGame extends Component {
         this.hinted = -1;
         const result = applyAction(this.state, action);
         this.state = result.state;
+        if(this.state.status==='won')this.completedPictures.add(this.levelIndex);
         const found = result.events.find((e) => e.type === 'found');
         const wrong = result.events.find((e) => e.type === 'wrong');
         const hint = result.events.find((e) => e.type === 'hint');
@@ -349,6 +376,9 @@ export class MeowGame extends Component {
             this.effects!.cross(p.x, p.y, this.boardSize, this.boardSize / this.state.level.size);
             this.boardModel!.found(index, found.excluded!);
             this.cellViews[index].pop();
+            const unlocked=result.events.filter(e=>e.type==='unlocked');
+            for(const event of unlocked)this.cellViews[event.index!].pop();
+            if(unlocked.length)this.messageLabel!.string=`Đã mở ${unlocked.length} khóa!`;
 
             this.companion?.setExpression('happy',1.2);
             this.shakeBoard(6,.16);
@@ -397,8 +427,22 @@ export class MeowGame extends Component {
         if (this.ready && this.enabledInHierarchy) this.loadLevel(this.levelIndex);
     }
 
+    onGallery(): void {
+        if(!this.ready||!this.enabledInHierarchy)return;
+        this.cancelVisuals();this.modalRoot!.active=false;this.modalMode='none';this.peeking=false;
+        this.render();this.gallery!.showMenu(this.levelIndex,this.completedPictures);
+    }
+
+    private resumeFromGallery(): void {
+        if(!this.coreTutorialSeen){this.showTutorial();return;}
+        if(this.state.status!=='playing'){this.showResult(false);return;}
+        this.messageLabel!.string=this.instruction;this.render();this.showMechanicTutorial();
+    }
+
     private loadLevel(index: number): void {
+        if(!Number.isInteger(index)||index<0||index>=LEVELS.length)return;
         this.cancelVisuals();
+        this.gallery!.hide();
         this.levelIndex = index;
         this.state = createGame(LEVELS[index]);
         this.resultCelebrated = false;
@@ -410,6 +454,18 @@ export class MeowGame extends Component {
         this.modalRoot!.active = false;
         this.messageLabel!.string = this.instruction;
         this.resize();
+        if(!this.coreTutorialSeen)this.showTutorial();else this.showMechanicTutorial();
+    }
+
+    private showMechanicTutorial(): void {
+        const blockers=this.state.level.blockers||[];
+        let title='',description='';
+        if(!this.taughtStone&&blockers.some(b=>b.type==='stone')){
+            this.taughtStone=true;title='Ô đá';description='Ô có đá không chứa mèo.\nMàu bên dưới vẫn là màu của tranh.';
+        }else if(!this.taughtLock&&blockers.some(b=>b.type==='lock')){
+            this.taughtLock=true;title='Mở khóa';description='Tìm đủ số mèo ghi trên khóa để mở.\nKhóa 1 cần 1 mèo · Khóa 2 cần 2 mèo.';
+        }
+        if(title){this.mechanicTutorial=true;this.showModal('tutorial',title,description,'Đã hiểu');}
     }
 
     private showModal(mode: 'tutorial' | 'won' | 'lost', title: string, description: string, confirm: string): void {
@@ -420,11 +476,15 @@ export class MeowGame extends Component {
         this.modalConfirmLabel!.string = confirm;
         this.modalPeek!.active = mode === 'won';
 
-        this.tutorialRules!.active=mode==='tutorial';
+        this.tutorialRules!.active=mode==='tutorial'&&!this.mechanicTutorial;
         this.modalConfirmButton!.node.setPosition(0,mode==='tutorial'?-238:-190);
         this.modalGlow!.active=mode==='won';
-        this.modalDescription!.node.setPosition(0,mode==='tutorial'?-146:-80);
-        this.modalTitle!.node.setPosition(0,mode==='tutorial'?68:34);
+        this.modalDescription!.node.setPosition(0,mode==='tutorial'?(this.mechanicTutorial?-90:-146):-80);
+        this.modalTitle!.node.setPosition(0,mode==='tutorial'?68:mode==='won'?0:34);
+        this.modalMascot!.node.setPosition(0,mode==='won'?285:205);
+        this.setSize(this.modalMascot!.node,mode==='won'?112:240,mode==='won'?112:240);
+        if(this.pictureThumbnail)this.pictureThumbnail.active=mode==='won';
+        if(mode==='won')this.renderThumbnail();
         this.modalRoot!.active=true;
         this.modalMascot?.setExpression(mode==='lost'?'surprised':mode==='won'?'happy':'idle');
         const scale=this.modalScale,opacity=this.modalCard!.getComponent(UIOpacity)!;
@@ -441,33 +501,48 @@ export class MeowGame extends Component {
     }
 
     private showTutorial(): void {
+        this.mechanicTutorial=false;
         this.showModal('tutorial', 'Tìm mèo', 'Chạm để đánh dấu ×\nGiữ 0,4 giây để tìm mèo', 'Bắt đầu');
     }
 
-    private showResult(): void {
+    private renderThumbnail(): void {
+        const level=this.state.level,n=level.size,c=176/n;
+        this.thumbnailPixels.forEach((sprite,i)=>{
+            sprite.node.active=i<n*n;if(i>=n*n)return;
+            sprite.color=color(level.palette[level.cells[i]]);
+            this.setSize(sprite.node,c+.1,c+.1);
+            sprite.node.setPosition(-88+(i%n+.5)*c,88-(Math.floor(i/n)+.5)*c);
+        });
+    }
+
+    private showResult(animate=true): void {
         if (this.state.status === 'playing') return;
         if (this.state.status === 'lost') {
             this.showModal('lost', 'Thử lại nhé', 'Bạn đã dùng hết 3 tim.', 'Chơi lại');
             return;
         }
-        const final = this.levelIndex === LEVELS.length - 1;
-        this.showModal(
-            'won',
-            final ? 'Hoàn tất demo' : 'Hoàn thành',
-            `${this.state.level.title}\n${this.state.found.length} mèo · ${this.state.hearts} tim còn lại`,
-            final ? 'Chơi từ đầu' : 'Màn tiếp theo'
-        );
+        this.modalRoot!.active=false;this.modalMode='none';
+        this.gallery!.showOutro(this.levelIndex,animate);
+        if(!this.resultCelebrated){
+            this.resultCelebrated=true;
+            this.effects!.node.setParent(this.gallery!.outroRoot!);
+            this.effects!.node.setSiblingIndex(2); // confetti behind the picture, not across its pixels
+            const size=this.node.getComponent(UITransform)!.contentSize;
+            this.effects!.celebrate(size.width,size.height);
+        }
     }
 
     onModalConfirm(): void {
         if (!this.ready || !this.enabledInHierarchy) return;
         if (this.modalMode === 'tutorial') {
+            this.coreTutorialSeen=true;
             this.modalRoot!.active = false;
             this.modalMode = 'none';
             this.messageLabel!.string = this.instruction;
+            this.showMechanicTutorial();
             return;
         }
-        this.loadLevel(this.modalMode === 'lost' ? this.levelIndex : this.levelIndex === LEVELS.length - 1 ? 0 : this.levelIndex + 1);
+        if(this.modalMode==='lost')this.loadLevel(this.levelIndex);
     }
 
     onPeek(): void {

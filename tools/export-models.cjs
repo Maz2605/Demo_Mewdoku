@@ -1,7 +1,6 @@
 // Editable glTF copies of the exact procedural geometry used by Board3D.
 const fs=require('node:fs');
-const ts=require('C:/ProgramData/cocos/editors/Creator/3.8.4/resources/app.asar.unpacked/node_modules/typescript');
-require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,f);
+require('./toolchain.cjs').registerTypeScript();
 const {roundedCube}=require('../assets/scripts/view/ModelGeometry.ts');
 fs.mkdirSync('assets/models',{recursive:true});
 for(const [name,radius,scale,rgba] of [['RoundedBlock',.12,[1,1,.4],[1,.68,.25,1]],['BevelledTray',.035,[8,8,.6],[.65,.48,.75,1]],['ColorPlane',0,[1,1,1],[1,1,1,1]]]){

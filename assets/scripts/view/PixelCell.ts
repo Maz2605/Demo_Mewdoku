@@ -1,7 +1,7 @@
 import { _decorator, Component, Label, Node, Sprite, tween, Tween, UITransform, Vec3 } from 'cc';
-import { CellState } from '../core/Puzzle';
+import { Blocker, CellState } from '../core/Puzzle';
 import { color,contrast } from './Ui';
-import { cellAppearance } from './CellAppearance';
+import { blockerAppearance, cellAppearance } from './CellAppearance';
 const {ccclass,property}=_decorator;
 
 /** All visual children are authored in PixelCell/GameRoot prefabs. */
@@ -14,6 +14,9 @@ export class PixelCell extends Component {
     @property(Node) catNode:Node|null=null;
     @property(Sprite) outline:Sprite|null=null;
     @property(Sprite) holdRing:Sprite|null=null;
+    @property(Sprite) stoneIcon:Sprite|null=null;
+    @property(Sprite) lockIcon:Sprite|null=null;
+    @property(Label) lockCount:Label|null=null;
     private width=80;private hex='#FFFFFF';private symbol='';
     configure(width:number,hex:string,symbol:string):void{
         this.width=width;this.hex=hex;this.symbol=symbol;this.node.getComponent(UITransform)!.setContentSize(width,width);
@@ -23,8 +26,10 @@ export class PixelCell extends Component {
         this.markSprite?.node.getComponent(UITransform)!.setContentSize(width*.50,width*.50);
         this.dotSprite?.node.getComponent(UITransform)!.setContentSize(width*.34,width*.34);
         this.outline!.node.getComponent(UITransform)!.setContentSize(width-4,width-4);this.holdRing!.node.getComponent(UITransform)!.setContentSize(width*.82,width*.82);
+        for(const icon of [this.stoneIcon,this.lockIcon])if(icon){icon.node.getComponent(UITransform)!.setContentSize(width*.44,width*.44);icon.node.setPosition(width*.23,width*.23);}
+        if(this.lockCount){this.lockCount.fontSize=Math.max(22,width*.23);this.lockCount.lineHeight=this.lockCount.fontSize+4;this.lockCount.node.getComponent(UITransform)!.setContentSize(width*.42,width*.38);this.lockCount.node.setPosition(width*.23,-width*.17);}
     }
-    render(state:CellState,finished:boolean,inspect:boolean,selected:boolean,revealed=true):void{
+    render(state:CellState,finished:boolean,inspect:boolean,selected:boolean,revealed=true,blocker?:Blocker,found=0):void{
         const appearance=cellAppearance(state,finished,inspect,revealed);
         // During play, color planes stay in the 3D pass below fragments. Only the
         // final picture uses this UI layer, otherwise it would occlude flying chips.
@@ -33,6 +38,11 @@ export class PixelCell extends Component {
         if(this.markSprite)this.markSprite.node.active=appearance.mark;
         if(this.dotSprite)this.dotSprite.node.active=false; // Compatibility with older serialized cells.
         this.marker!.color=color(contrast(this.hex));this.outline!.node.active=!finished&&(selected||state==='wrong');this.outline!.color=color(state==='wrong'?'#D84C78':'#FFFFFF');
+        const obstacle=blockerAppearance(blocker,state,found,finished,revealed);
+        if(this.stoneIcon)this.stoneIcon.node.active=obstacle==='stone';
+        if(this.lockIcon)this.lockIcon.node.active=obstacle==='lock';
+        if(this.lockCount){this.lockCount.node.active=obstacle==='lock';this.lockCount.string=blocker?.type==='lock'?String(blocker.unlockAfter):'';}
+        this.marker!.node.setPosition(obstacle==='none'?0:-this.width*.22,obstacle==='none'?0:-this.width*.18);
     }
     hold(progress:number):void{this.holdRing!.fillRange=progress;}
     pop(delay=0):void{

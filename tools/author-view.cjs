@@ -1,10 +1,9 @@
 // OFFLINE authoring command. Scene/prefabs are checked in as assets; gameplay never runs this.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 // Run skin-assets.cjs first. Never replace generated production artwork here.
-const ts=require('C:/ProgramData/cocos/editors/Creator/3.8.4/resources/app.asar.unpacked/node_modules/typescript');
-require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,f);
+require('./toolchain.cjs').registerTypeScript();
 const {LEVELS}=require('../assets/scripts/core/Levels.ts');
-const BASE='C:/ProgramData/cocos/editors/Creator/3.8.4/resources/resources/3d/engine/editor/assets';
+const BASE=path.join(require('./toolchain.cjs').creatorHome,'resources/resources/3d/engine/editor/assets');
 const ROOT_UUID='b750dc32-102d-4a36-bb87-8de9416765ef';
 const RT_UUID='79b43a41-1ca9-4fc9-9998-c4cece310401';
 const UI=33554432,MODEL=1<<19;
@@ -19,7 +18,7 @@ function quat(x=0,y=0,z=0){const d=Math.PI/360,sx=Math.sin(x*d),cx=Math.cos(x*d)
 for(const dir of ['assets/resources/prefabs','assets/resources/render','assets/prefabs','assets/materials/palette'])fs.mkdirSync(dir,{recursive:true});
 function walk(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,entry.name);if(entry.isDirectory()){meta(f,'directory','1.2.0');walk(f);}else if(f.endsWith('.ts'))meta(f,'typescript','4.0.24');}}walk('assets');
 const script=name=>compress(JSON.parse(fs.readFileSync('assets/scripts/'+name+'.ts.meta')).uuid);
-const types={game:script('MeowGame'),cell:script('view/PixelCell'),board:script('view/Board3D'),fx:script('view/GameEffects'),mascot:script('view/MascotView')};
+const types={game:script('MeowGame'),cell:script('view/PixelCell'),board:script('view/Board3D'),fx:script('view/GameEffects'),mascot:script('view/MascotView'),gallery:script('view/GalleryView')};
 const fonts={title:meta('assets/art/fonts/Nunito-ExtraBold.ttf','ttf-font','1.0.1'),body:meta('assets/art/fonts/Nunito-SemiBold.ttf','ttf-font','1.0.1')};
 const labelTemplate=JSON.parse(fs.readFileSync(BASE+'/default_prefab/ui/Label.prefab')).find(o=>o.__type__==='cc.Label');
 const spriteTemplate=JSON.parse(fs.readFileSync(BASE+'/default_prefab/ui/Sprite.prefab')).find(o=>o.__type__==='cc.Sprite');
@@ -27,17 +26,19 @@ const buttonTemplate=JSON.parse(fs.readFileSync(BASE+'/default_prefab/ui/Button.
 const canvasTemplate=JSON.parse(fs.readFileSync(BASE+'/default_prefab/ui/Canvas.prefab'));
 const rtTemplate=JSON.parse(fs.readFileSync(BASE+'/default_file_content/render-texture/default.rt.meta'));
 function imageFrame(name,border=0,file='assets/art/ui/'+name+'.png'){
+ const filter=file.includes('/pictures/')?'nearest':'linear';
  const u=meta(file,'image','1.0.27'),buf=fs.readFileSync(file),w=buf.readUInt32BE(16),h=buf.readUInt32BE(20);
  const sub=(importer,suffix,ver,data)=>({importer,uuid:u+'@'+suffix,displayName:name,id:suffix,name:importer==='texture'?'texture':'spriteFrame',userData:data,ver,imported:true,files:['.json'],subMetas:{}});
  write(file+'.meta',{ver:'1.0.27',importer:'image',imported:true,uuid:u,files:['.json','.png'],subMetas:{
- '6c48a':sub('texture','6c48a','1.0.22',{wrapModeS:'clamp-to-edge',wrapModeT:'clamp-to-edge',minfilter:'linear',magfilter:'linear',mipfilter:'none',anisotropy:0,isUuid:true,imageUuidOrDatabaseUri:u,visible:false}),
+ '6c48a':sub('texture','6c48a','1.0.22',{wrapModeS:'clamp-to-edge',wrapModeT:'clamp-to-edge',minfilter:filter,magfilter:filter,mipfilter:'none',anisotropy:0,isUuid:true,imageUuidOrDatabaseUri:u,visible:false}),
  'f9941':sub('sprite-frame','f9941','1.0.12',{trimType:'none',trimThreshold:1,rotated:false,offsetX:0,offsetY:0,trimX:0,trimY:0,width:w,height:h,rawWidth:w,rawHeight:h,borderTop:border,borderBottom:border,borderLeft:border,borderRight:border,packable:true,pixelsToUnit:100,pivotX:.5,pivotY:.5,meshType:0,isUuid:true,imageUuidOrDatabaseUri:u+'@6c48a',atlasUuid:''})},userData:{hasAlpha:true,type:'sprite-frame',fixAlphaTransparencyArtifacts:false,redirect:u+'@6c48a'}});
  return u+'@f9941';
 }
 const frames={panel:imageFrame('panel',30),flat:imageFrame('flat'),outline:imageFrame('outline',26),ring:imageFrame('ring'),cat:imageFrame('cat-token',0,'assets/art/cat-token.png')};
-for(const n of ['button-purple','button-gold','sky','cloud','paw','heart','heart-empty','hint','inspect','retry','star','puff','ray','confetti','glow','shadow','mark','dot'])frames[n]=imageFrame(n,n.startsWith('button')?30:0);
+for(const n of ['button-purple','button-gold','sky','cloud','paw','heart','heart-empty','hint','inspect','retry','star','puff','ray','confetti','glow','shadow','mark','dot','stone','lock'])frames[n]=imageFrame(n,n.startsWith('button')?30:0);
 frames.logo=imageFrame('logo',0,'assets/art/logo-skin.png');
 for(const n of ['idle','happy','surprised'])frames[n]=imageFrame(n,0,`assets/art/mascot-${n}-skin.png`);
+const pictureFrames=LEVELS.map(l=>imageFrame(l.id,0,`assets/art/pictures/${l.id}.png`));
 write('assets/resources/render/Board.rt',{__type__:'cc.RenderTexture',_objFlags:0,_native:'',content:{base:'2,2,0,0,0,0',w:1024,h:1024,n:'Board'}});
 const rtMeta=clone(rtTemplate);rtMeta.uuid=RT_UUID;rtMeta.userData={...rtMeta.userData,width:1024,height:1024,redirect:RT_UUID+'@f9941',wrapModeS:'clamp-to-edge',wrapModeT:'clamp-to-edge'};
 rtMeta.subMetas.f9941.uuid=RT_UUID+'@f9941';rtMeta.subMetas.f9941.displayName='Board';rtMeta.subMetas.f9941.userData={imageUuidOrDatabaseUri:RT_UUID,width:1024,height:1024};write('assets/resources/render/Board.rt.meta',rtMeta);
@@ -73,7 +74,10 @@ class Graph{
   const marker=this.label('Mark',n,'',28,width,width),mark=this.art('MarkSprite',n,frames.mark,width*.55),head=this.node('Cat',n,{width:width*.72,height:width*.72,active:false});this.sprite(head,frames.cat);this.a[mark.n]._active=false;
   const outline=this.node('Outline',n,{width:width-4,height:width-4,active:false}),outlineSprite=this.sprite(outline,frames.outline,'#FFFFFF',true);
   const ring=this.node('HoldRing',n,{width:width*.82,height:width*.82}),ringSprite=this.sprite(ring,frames.ring);Object.assign(this.a[ringSprite],{_type:3,_fillType:2,_fillCenter:{__type__:'cc.Vec2',x:.5,y:.5},_fillRange:0,_fillStart:.25});
-  const c=this.comp(types.cell,n,{pixel:id(pixelSprite),marker:id(marker.c),markSprite:id(mark.c),catNode:id(head),outline:id(outlineSprite),holdRing:id(ringSprite)});return {n,c};
+  const stone=this.art('Stone',n,frames.stone,width*.44),lock=this.art('Lock',n,frames.lock,width*.44),lockCount=this.label('LockCount',n,'',28,width*.42,width*.38,'#44305F');
+  for(const v of [stone,lock,lockCount])this.a[v.n]._active=false;
+  this.comp('cc.LabelOutline',lockCount.n,{_color:color('#FFF8EE'),_width:3});
+  const c=this.comp(types.cell,n,{pixel:id(pixelSprite),marker:id(marker.c),markSprite:id(mark.c),catNode:id(head),outline:id(outlineSprite),holdRing:id(ringSprite),stoneIcon:id(stone.c),lockIcon:id(lock.c),lockCount:id(lockCount.c)});return {n,c};
  }
  tile(name,parent,c=166,hex=0,x=0,y=0,active=true){const n=this.node(name,parent,{layer:MODEL,active}),base=this.node('Base',n,{layer:MODEL,pos:[x,y,-5],scale:[c,c,1]}),cap=this.node('Cap',n,{layer:MODEL,pos:[x,y,c*.16],scale:[c*.90,c*.90,c*.42],rot:[-7,-7,0]});this.mesh(base,meshes.plane,materialMap[LEVELS[0].palette[hex]]);this.mesh(cap,meshes.cube,materialMap[LEVELS[0].palette[hex]]);return n;}
  seal(){const objects=this.a.slice();objects.forEach((o,i)=>{if(o.__type__==='cc.Node'){const p=this.add({__type__:'cc.PrefabInfo',root:id(1),asset:id(0),fileId:compress(uuid(this.paths[i]))});o._prefab=id(p);o._id=uuid(this.paths[i]);}else if(o.node){o.__prefab=id(this.add({__type__:'cc.CompPrefabInfo',fileId:compress(uuid(this.paths[o.node.__id__]+'/'+o.__type__+'/'+i))}));}});write(this.file,this.a);}
@@ -107,11 +111,14 @@ const hint=g.button('Hint',root,'Gợi ý · 2',194,'#7C6ABB','onHint',root),ins
 [hint,inspect,retry].forEach((b,i)=>g.a[b.n]._lpos=vec((i-1)*210,-422,0));
 for(const [b,key] of [[hint,'hint'],[inspect,'inspect'],[retry,'retry']])g.art('Icon',b.n,frames[key],42,42,[-62,0,0]);
 const hintBadge=g.label('HintBadge',hint.n,'2',23,35,35,'#7939CB',[78,30,0]);
+const galleryButton=g.button('ChoosePictures',root,'Chọn\ntranh',112,'#FFFFFF','onGallery',root);
 const message=g.label('Instruction',root,'Chạm: đánh dấu × · Giữ: tìm mèo',26,650,80,'#44305F',[0,-515,0]);
 const modal=g.node('Modal',root,{width:720,height:1280,active:false}),dimmer=g.art('Dimmer',modal,frames.flat,720,1280);g.a[dimmer.c]._color=color('#29243E',185);g.comp('cc.BlockInputEvents',modal,{});
 const card=g.node('Card',modal,{width:620,height:740});g.sprite(card,frames.panel,'#FFFFFF',true);g.comp('cc.UIOpacity',card,{_opacity:255});
 const modalGlow=g.art('MascotGlow',card,frames.glow,300,300,[0,198,0],'#FFE391');
 const modalMascot=g.mascot('ModalMascot',card,240,[0,205,0]);
+const pictureThumbnail=g.node('PictureThumbnail',card,{width:176,height:176,pos:[0,130,0],active:false}),thumbnailPixels=[];
+for(let i=0;i<64;i++){const p=g.art('ThumbnailPixel_'+i,pictureThumbnail,frames.flat,22,22);thumbnailPixels.push(id(p.c));}
 const modalTitle=g.label('Title',card,'Tìm mèo',40,550,65,'#7939CB',[0,68,0]),description=g.label('Description',card,'Chạm để đánh dấu ×\nGiữ 0,4 giây để tìm mèo',27,540,110,'#44305F',[0,-146,0]);
 const rules=g.node('TutorialRules',card,{width:560,height:142,pos:[0,-40,0]});
 for(let i=0;i<3;i++){const rc=g.node('Rule_'+i,rules,{width:174,height:142,pos:[(i-1)*184,0,0]});g.sprite(rc,frames.panel,'#F4EAFF',true);
@@ -120,6 +127,33 @@ for(let i=0;i<3;i++){const rc=g.node('Rule_'+i,rules,{width:174,height:142,pos:[
  g.label('RuleText',rc,['1 mèo\nmỗi màu','1 mèo mỗi\nhàng / cột','Mèo không\nchạm nhau'][i],23,158,70,'#44305F',[0,-32,0]);}
 const confirm=g.button('Confirm',card,'Bắt đầu',470,'#FFFFFF','onModalConfirm',root);g.a[confirm.n]._lpos=vec(0,-238,0);
 const peek=g.label('Peek',card,'Xem tranh',25,400,42,'#7939CB',[0,-302,0]);const peekButton=clone(buttonTemplate);peekButton._target=id(peek.n);peekButton._transition=0;peekButton.clickEvents=[{__type__:'cc.ClickEvent',target:id(root),component:'MeowGame',_componentId:types.game,handler:'onPeek',customEventData:''}];for(const k of ['_normalSprite','_hoverSprite','_pressedSprite','_disabledSprite'])peekButton[k]=null;g.comp('cc.Button',peek.n,peekButton);
+// Gallery and full-size outro own separate input-blocking backdrops.
+const galleryHost=g.node('PictureGallery',root,{width:720,height:1280});
+function overlay(name,alpha=218){const n=g.node(name,galleryHost,{width:720,height:1280,active:false});const d=g.art('Backdrop',n,frames.flat,720,1280);g.a[d.c]._color=color('#342B52',alpha);g.comp('cc.BlockInputEvents',n,{});return n;}
+function galleryAction(name,parent,text,handler,value=''){
+ const b=g.button(name,parent,text,240);g.a[b.c].clickEvents=[{__type__:'cc.ClickEvent',target:id(galleryHost),component:'GalleryView',_componentId:types.gallery,handler,customEventData:value}];return b;
+}
+const menuRoot=overlay('LevelMenu'),menuCard=g.node('GalleryCard',menuRoot,{width:680,height:1120});g.sprite(menuCard,frames.panel,'#FFFFFF',true);
+const menuTitle=g.label('GalleryTitle',menuCard,'Chọn tranh',40,480,54,'#7939CB');
+const menuSubtitle=g.label('GallerySubtitle',menuCard,'20 bức tranh · Chọn bất kỳ màn nào',24,500,34);
+const closeButton=galleryAction('CloseGallery',menuCard,'Đóng','onClose');
+const tiles=[],tileImages=[],tileLabels=[],tileBadges=[];
+for(let i=0;i<LEVELS.length;i++){
+ const b=galleryAction('LevelCard_'+String(i+1).padStart(2,'0'),menuCard,'','onTile',String(i));
+ g.a[b.label]._color=color('#44305F');
+ const node=g.a[b.n];const background=g.a[node._components.map(r=>r.__id__).find(j=>g.a[j].__type__==='cc.Sprite')];background._spriteFrame=asset(frames.panel,'cc.SpriteFrame');
+ const image=g.art('Picture',b.n,pictureFrames[i],96);const badge=g.label('Badge',b.n,'',25,36,36,'#7939CB');
+ tiles.push(id(b.c));tileImages.push(id(image.c));tileLabels.push(id(b.label));tileBadges.push(id(badge.c));
+}
+const outroRoot=overlay('PictureOutro',255),outroGlow=g.art('PictureGlow',outroRoot,frames.glow,800,800,[0,0,0],'#FFE391');
+const outroFrame=g.node('ArtFrame',outroRoot,{width:650,height:650});g.sprite(outroFrame,frames.panel,'#FFFFFF',true);g.comp('cc.UIOpacity',outroFrame,{_opacity:255});
+const outroPicture=g.art('FinishedPicture',outroFrame,pictureFrames[0],610);
+const outroTitle=g.label('OutroTitle',outroRoot,'Bức tranh của bạn',40,650,60,'#FFD447');
+const outroName=g.label('OutroName',outroRoot,'1/20 · Cá nhỏ',30,650,48,'#FFF8EE');
+const outroActions=g.node('OutroActions',outroRoot,{width:660,height:112});g.comp('cc.UIOpacity',outroActions,{_opacity:0});
+const outroNext=galleryAction('NextPicture',outroActions,'Tranh tiếp theo','onContinue');g.a[g.a[outroNext.n]._components.map(r=>r.__id__).find(j=>g.a[j].__type__==='cc.Sprite')]._spriteFrame=asset(frames['button-gold'],'cc.SpriteFrame');g.a[outroNext.label]._color=color('#663915');
+const outroChoose=galleryAction('ChoosePicture',outroActions,'Chọn tranh','onChoose');
+const gallery=g.comp(types.gallery,galleryHost,{menuRoot:id(menuRoot),menuCard:id(menuCard),menuTitle:id(menuTitle.c),menuSubtitle:id(menuSubtitle.c),closeButton:id(closeButton.c),tiles,tileImages,tileLabels,tileBadges,pictureFrames:pictureFrames.map(uuid=>asset(uuid,'cc.SpriteFrame')),outroRoot:id(outroRoot),pictureFrame:id(outroFrame),picture:id(outroPicture.c),glow:id(outroGlow.n),outroTitle:id(outroTitle.c),outroName:id(outroName.c),actions:id(outroActions),nextButton:id(outroNext.c),nextLabel:id(outroNext.label),chooseButton:id(outroChoose.c)});
 const modelRoot=g.node('BoardModels',root,{layer:MODEL,pos:[10000,0,0]});
 const tray=g.node('Tray',modelRoot,{layer:MODEL,pos:[0,0,-43],scale:[706,706,56]});g.mesh(tray,meshes.tray,materialMap['#A77AC0']);
 const inset=g.node('Inset',modelRoot,{layer:MODEL,pos:[0,0,-13],scale:[672,672,9]});g.mesh(inset,meshes.tray,materialMap['#654E83']);
@@ -131,7 +165,7 @@ const lightNode=g.node('KeyLight',modelRoot,{layer:MODEL,rot:[-28,-32,0]});g.com
 const cameraNode=g.node('BoardCamera',modelRoot,{layer:MODEL,pos:[0,0,1200]}),cameraData=clone(canvasTemplate.find(o=>o.__type__==='cc.Camera'));delete cameraData.__prefab;
 const camera=g.comp('cc.Camera',cameraNode,{...cameraData,node:id(cameraNode),_priority:-10,_orthoHeight:382,_near:1,_far:3000,_visibility:MODEL,_clearFlags:7,_color:color('#000000',0),_targetTexture:asset(RT_UUID,'cc.RenderTexture')});
 const boardModel=g.comp(types.board,modelRoot,{tileNodes,fragmentNodes,paletteHexes:palette,paletteMaterials:palette.map(hex=>asset(materialMap[hex],'cc.Material')),paletteFlatMaterials:palette.map(hex=>asset(flatMaterialMap[hex],'cc.Material')),boardCamera:id(camera),boardImage:id(image),trayNode:id(tray),insetNode:id(inset),maxFragments:32});
-g.comp(types.game,root,{background:id(bg),brandLabel:id(brand.c),logo:id(logo.n),cloudLeft:id(cloudLeft.n),cloudRight:id(cloudRight.n),sizeBadge:id(sizeBadge.c),heartSprites,heartFull:asset(frames.heart,'cc.SpriteFrame'),heartEmpty:asset(frames['heart-empty'],'cc.SpriteFrame'),hintBadge:id(hintBadge.c),companion:id(companion.c),modalMascot:id(modalMascot.c),tutorialRules:id(rules),modalGlow:id(modalGlow.n),levelLabel:id(level.c),statusPanel:id(status),catsLabel:id(cats.c),heartsLabel:id(hearts.c),board:id(board),boardImage:id(image),cellViews,boardModel:id(boardModel),effects:id(fx),hintButton:id(hint.c),colorButton:id(inspect.c),retryButton:id(retry.c),hintLabel:id(hint.label),colorLabel:id(inspect.label),messageLabel:id(message.c),modalRoot:id(modal),modalCard:id(card),modalTitle:id(modalTitle.c),modalDescription:id(description.c),modalConfirmButton:id(confirm.c),modalConfirmLabel:id(confirm.label),modalPeek:id(peek.n),bounceStrength:.65});
+g.comp(types.game,root,{background:id(bg),brandLabel:id(brand.c),logo:id(logo.n),cloudLeft:id(cloudLeft.n),cloudRight:id(cloudRight.n),sizeBadge:id(sizeBadge.c),heartSprites,heartFull:asset(frames.heart,'cc.SpriteFrame'),heartEmpty:asset(frames['heart-empty'],'cc.SpriteFrame'),hintBadge:id(hintBadge.c),companion:id(companion.c),modalMascot:id(modalMascot.c),tutorialRules:id(rules),modalGlow:id(modalGlow.n),pictureThumbnail:id(pictureThumbnail),thumbnailPixels,gallery:id(gallery),galleryButton:id(galleryButton.c),levelLabel:id(level.c),statusPanel:id(status),catsLabel:id(cats.c),heartsLabel:id(hearts.c),board:id(board),boardImage:id(image),cellViews,boardModel:id(boardModel),effects:id(fx),hintButton:id(hint.c),colorButton:id(inspect.c),retryButton:id(retry.c),hintLabel:id(hint.label),colorLabel:id(inspect.label),messageLabel:id(message.c),modalRoot:id(modal),modalCard:id(card),modalTitle:id(modalTitle.c),modalDescription:id(description.c),modalConfirmButton:id(confirm.c),modalConfirmLabel:id(confirm.label),modalPeek:id(peek.n),bounceStrength:.65});
 g.seal();
 // The scene owns a normal, Editor-expandable instance of GameRoot. Editing the prefab updates it.
 const sceneUuid=JSON.parse(fs.readFileSync('assets/scenes/MeowPop.scene.meta')).uuid;

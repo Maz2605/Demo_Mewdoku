@@ -1,5 +1,7 @@
 # Verification — Canva skin, 2026-11-13
 
+Historical skin evidence. Current 20-picture/blocker checks, fresh builds and remaining limitations are recorded in [PICTURE_LEVELS.md](PICTURE_LEVELS.md).
+
 ## Automated checks
 
 - `npm test`: **27/27 passing**, zero failures.

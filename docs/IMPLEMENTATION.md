@@ -1,5 +1,7 @@
 # Implementation record — Canva skin
 
+Historical skin record. Current 20-picture/blocker implementation and verification: [PICTURE_LEVELS.md](PICTURE_LEVELS.md). The engine is now 3.8.8 and the repository has an initial commit; older environment notes below describe the original session.
+
 ## Approved contract
 
 Seven-package visual upgrade (2026-11-13): cohesive candy/sky/orange-kitten skin, keeping Creator 3.8.4, real 3D board, four existing puzzles and core gameplay. Full plan/ledger: `superpowers/plans/2026-11-13-canva-visual.md`; style: `visual/STYLE.md`.

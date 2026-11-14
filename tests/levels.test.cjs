@@ -2,8 +2,8 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {LEVELS}=require('../assets/scripts/core/Levels.ts');
 const {validateLevel,solveLevel,logicalSolve,createGame,applyAction}=require('../assets/scripts/core/Puzzle.ts');
-test('four authored pictures have unique independent answers and a complete logical path',()=>{
-  assert.deepEqual(LEVELS.map(l=>l.size),[4,5,6,8]);
+test('authored pictures have unique independent answers and a complete logical path',()=>{
+  assert.equal(LEVELS.length,20);
   for(const l of LEVELS){
     assert.deepEqual(validateLevel(l),[],l.id);
     const answers=solveLevel(l);

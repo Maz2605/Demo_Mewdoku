@@ -1,6 +1,7 @@
 /** Engine-independent rules. Index = row * size + column, origin top-left. */
+export type Blocker = { type: 'stone'; index: number } | { type: 'lock'; index: number; unlockAfter: number };
 export interface LevelDefinition {
-    id: string; title: string; size: number; palette: string[]; cells: number[]; cats: number[];
+    id: string; title: string; size: number; palette: string[]; cells: number[]; cats: number[]; blockers?: Blocker[];
 }
 export type CellState = 'unknown' | 'marked' | 'excluded' | 'wrong' | 'found';
 export interface GameState {
@@ -8,8 +9,17 @@ export interface GameState {
     status: 'playing' | 'won' | 'lost';
 }
 export type Action = { type: 'mark' | 'find'; index: number } | { type: 'hint' };
-export interface GameEvent { type: 'found' | 'wrong' | 'hint' | 'won' | 'lost'; index?: number; excluded?: number[]; reason?: string; }
+export interface GameEvent { type: 'found' | 'wrong' | 'hint' | 'won' | 'lost' | 'unlocked'; index?: number; excluded?: number[]; reason?: string; }
 export interface Hint { index: number; reason: string; }
+
+/** Blocker availability is derived, so retry/resize cannot leave stale locks. */
+export function cellAccess(state: GameState, index: number): 'open' | 'stone' | 'locked' {
+    const blocker = state.level.blockers?.find(b => b.index === index);
+    if (blocker?.type === 'stone') return 'stone';
+    if (blocker?.type === 'lock' && state.found.length < blocker.unlockAfter &&
+        (state.cells[index] === 'unknown' || state.cells[index] === 'marked')) return 'locked';
+    return 'open';
+}
 
 function conflicts(level: LevelDefinition, a: number, b: number): boolean {
     const n = level.size, ar = Math.floor(a / n), br = Math.floor(b / n), ac = a % n, bc = b % n;
@@ -26,18 +36,31 @@ export function validateLevel(level: LevelDefinition): string[] {
     for (let a = 0; a < level.cats.length; a++) for (let b = a + 1; b < level.cats.length; b++) {
         if (conflicts(level, level.cats[a], level.cats[b])) errors.push('Mèo vi phạm hàng/cột/màu hoặc chạm nhau.');
     }
+    const occupied = new Set<number>();
+    for (const b of level.blockers || []) {
+        if (!Number.isInteger(b.index) || b.index < 0 || b.index >= n*n) errors.push('Blocker ngoài bảng.');
+        if (occupied.has(b.index)) errors.push('Blocker trùng ô.');
+        occupied.add(b.index);
+        if (b.type === 'stone') {
+            if (level.cats.includes(b.index)) errors.push('Đá không thể chứa mèo.');
+        } else if (b.type === 'lock') {
+            if (b.unlockAfter !== 1 && b.unlockAfter !== 2) errors.push('Khóa cần ngưỡng 1 hoặc 2 mèo.');
+        } else errors.push('Loại blocker không hợp lệ.');
+    }
     return errors;
 }
 
 /** Exhaustive answer oracle, independent of authored cats. Stops at two answers. */
 export function solveLevel(level: LevelDefinition): number[][] {
     const n = level.size, results: number[][] = [], chosen: number[] = [];
+    const stones = new Set((level.blockers || []).filter(b => b.type === 'stone').map(b => b.index));
     if (level.cells.length !== n * n) return results;
     const visit = (row: number) => {
         if (results.length >= 2) return;
         if (row === n) { results.push(chosen.slice()); return; }
         for (let col = 0; col < n; col++) {
             const index = row * n + col;
+            if (stones.has(index)) continue;
             if (chosen.every(other => !conflicts(level, index, other))) {
                 chosen.push(index); visit(row + 1); chosen.pop();
             }
@@ -53,8 +76,10 @@ function unitId(level: LevelDefinition, index: number, axis: number): number {
 /** Singles, unit support and Hall sets only; never consults level.cats or backtracks. */
 export function logicalSolve(level: LevelDefinition, initial: number[] = [], empty: number[] = []): { solved: boolean; cats: number[]; steps: Hint[] } {
     const n = level.size, cats = initial.slice(), steps: Hint[] = [];
+    const stones = new Set((level.blockers || []).filter(b => b.type === 'stone').map(b => b.index));
+    const accessible = (i: number) => !(level.blockers || []).some(b => b.type === 'lock' && b.index === i && cats.length < b.unlockAfter);
     const candidates = new Set<number>();
-    for (let i = 0; i < n * n; i++) if (!empty.includes(i) && !cats.some(c => conflicts(level, i, c))) candidates.add(i);
+    for (let i = 0; i < n * n; i++) if (!stones.has(i) && !empty.includes(i) && !cats.some(c => conflicts(level, i, c))) candidates.add(i);
     const units = () => {
         const result: { axis: number; id: number; cells: number[] }[] = [];
         for (let axis = 0; axis < 3; axis++) for (let id = 0; id < n; id++) {
@@ -68,7 +93,7 @@ export function logicalSolve(level: LevelDefinition, initial: number[] = [], emp
         changed = false;
         const groups = units();
         if (groups.some(g => g.cells.length === 0)) break;
-        const single = groups.find(g => g.cells.length === 1);
+        const single = groups.find(g => g.cells.length === 1 && accessible(g.cells[0]));
         if (single) {
             const index = single.cells[0], names = ['hàng', 'cột', 'màu'];
             cats.push(index);
@@ -126,6 +151,7 @@ export function applyAction(state: GameState, action: Action): { state: GameStat
     }
     const i = action.index;
     if (!Number.isInteger(i) || i < 0 || i >= state.cells.length) return { state, events: [] };
+    if (cellAccess(state, i) !== 'open') return { state, events: [] };
     const current = state.cells[i];
     if (current !== 'unknown' && current !== 'marked') return { state, events: [] };
     if (action.type === 'mark') {
@@ -142,11 +168,35 @@ export function applyAction(state: GameState, action: Action): { state: GameStat
     } else {
         next.cells[i] = 'found'; next.found.push(i);
         const excluded: number[] = [];
-        for (let j = 0; j < next.cells.length; j++) if ((next.cells[j] === 'unknown' || next.cells[j] === 'marked') && conflicts(state.level, i, j)) {
+        for (let j = 0; j < next.cells.length; j++) if (cellAccess(state, j) !== 'stone' && (next.cells[j] === 'unknown' || next.cells[j] === 'marked') && conflicts(state.level, i, j)) {
             next.cells[j] = 'excluded'; excluded.push(j);
         }
         events.push({ type: 'found', index: i, excluded });
+        for (const b of state.level.blockers || []) if (b.type === 'lock' && cellAccess(state, b.index) === 'locked' &&
+            next.found.length >= b.unlockAfter && next.cells[b.index] === 'unknown') events.push({ type: 'unlocked', index: b.index });
         if (next.found.length === state.level.size) { next.status = 'won'; events.push({ type: 'won' }); }
     }
     return { state: next, events };
+}
+
+/** Offline acceptance: every reachable correct subset must have a logical continuation. */
+export function validatePlayableLevel(level: LevelDefinition): { errors: string[]; reachableStates: number; steps: Hint[] } {
+    const errors = validateLevel(level);
+    const steps = errors.length ? [] : logicalSolve({...level, cats: []}).steps;
+    if (errors.length) return {errors, reachableStates: 0, steps};
+    const answers = solveLevel(level);
+    if (answers.length !== 1 || answers[0].some(i => !level.cats.includes(i))) errors.push('Cần đúng một nghiệm khớp đáp án.');
+    const pending = [createGame(level)], visited = new Set<string>();
+    while (pending.length) {
+        const state = pending.pop()!;
+        const key = state.found.slice().sort((a,b) => a-b).join(',');
+        if (visited.has(key)) continue;
+        visited.add(key);
+        const empty = state.cells.map((s,i) => s === 'excluded' ? i : -1).filter(i => i >= 0);
+        if (!logicalSolve({...level, cats: []}, state.found, empty).solved) errors.push('Bế tắc suy luận sau các ô: ' + (key || 'bắt đầu'));
+        for (const index of level.cats) if (!state.found.includes(index) && cellAccess(state,index) === 'open') {
+            pending.push(applyAction(state,{type:'find',index}).state);
+        }
+    }
+    return {errors, reachableStates: visited.size, steps};
 }

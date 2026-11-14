@@ -1,0 +1,598 @@
+[
+  {
+    "id": "fish",
+    "title": "Cá nhỏ",
+    "palette": [
+      "#55C5DD",
+      "#FFAF42",
+      "#FFF0B3",
+      "#343956"
+    ],
+    "rows": [
+      "0010",
+      "0121",
+      "0113",
+      "0210"
+    ],
+    "blockers": []
+  },
+  {
+    "id": "heart",
+    "title": "Trái tim",
+    "palette": [
+      "#79C9BA",
+      "#D95A87",
+      "#FF8FAD",
+      "#FFF0C9",
+      "#F6B4C8"
+    ],
+    "rows": [
+      "01010",
+      "12341",
+      "32221",
+      "01210",
+      "00100"
+    ],
+    "blockers": []
+  },
+  {
+    "id": "fishbone",
+    "title": "Xương cá",
+    "palette": [
+      "#79C9BA",
+      "#FFF0C9",
+      "#F5DFB5",
+      "#FFB24A",
+      "#E77936"
+    ],
+    "rows": [
+      "10001",
+      "12021",
+      "03330",
+      "12021",
+      "10004"
+    ],
+    "blockers": []
+  },
+  {
+    "id": "paw",
+    "title": "Dấu chân",
+    "palette": [
+      "#79C9BA",
+      "#F5DFB5",
+      "#FF8FAD",
+      "#474276",
+      "#FFB24A"
+    ],
+    "rows": [
+      "01010",
+      "21242",
+      "00200",
+      "02320",
+      "04442"
+    ],
+    "blockers": []
+  },
+  {
+    "id": "milk",
+    "title": "Hộp sữa",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936"
+    ],
+    "rows": [
+      "001100",
+      "012210",
+      "013310",
+      "414410",
+      "014510",
+      "031110"
+    ],
+    "blockers": []
+  },
+  {
+    "id": "yarn",
+    "title": "Cuộn len",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936"
+    ],
+    "rows": [
+      "001100",
+      "012230",
+      "123321",
+      "124424",
+      "012510",
+      "001100"
+    ],
+    "blockers": []
+  },
+  {
+    "id": "kitten",
+    "title": "Mèo tinh nghịch",
+    "palette": [
+      "#79C9BA",
+      "#FFB24A",
+      "#E77936",
+      "#FFF0C9",
+      "#3A3654",
+      "#FF8FAD"
+    ],
+    "rows": [
+      "100001",
+      "121121",
+      "211111",
+      "141141",
+      "133331",
+      "013530"
+    ],
+    "blockers": []
+  },
+  {
+    "id": "ginger",
+    "title": "Mèo cam may mắn",
+    "palette": [
+      "#67C7D5",
+      "#FFB84C",
+      "#DD793C",
+      "#FFE4B3",
+      "#3B3956",
+      "#F791B1",
+      "#C8E7DD",
+      "#FFF8EE"
+    ],
+    "rows": [
+      "11000011",
+      "12140121",
+      "12211221",
+      "11111111",
+      "17411471",
+      "33355333",
+      "03333335",
+      "00633600"
+    ],
+    "blockers": []
+  },
+  {
+    "id": "bowl",
+    "title": "Bát ăn",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936"
+    ],
+    "rows": [
+      "000000",
+      "002300",
+      "011110",
+      "122221",
+      "413410",
+      "005500"
+    ],
+    "blockers": [
+      {
+        "type": "stone",
+        "index": 2
+      }
+    ]
+  },
+  {
+    "id": "bow",
+    "title": "Nơ mèo",
+    "palette": [
+      "#79C9BA",
+      "#D95A87",
+      "#FF8FAD",
+      "#FFD447",
+      "#FFF0C9",
+      "#F6B4C8"
+    ],
+    "rows": [
+      "110011",
+      "121124",
+      "123321",
+      "124421",
+      "110051",
+      "000000"
+    ],
+    "blockers": [
+      {
+        "type": "stone",
+        "index": 34
+      },
+      {
+        "type": "stone",
+        "index": 27
+      }
+    ]
+  },
+  {
+    "id": "bell",
+    "title": "Chuông",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936",
+      "#C8E7DD"
+    ],
+    "rows": [
+      "0001000",
+      "0012100",
+      "0123210",
+      "0144450",
+      "0445410",
+      "1111113",
+      "0006000"
+    ],
+    "blockers": [
+      {
+        "type": "stone",
+        "index": 6
+      },
+      {
+        "type": "stone",
+        "index": 48
+      },
+      {
+        "type": "stone",
+        "index": 21
+      }
+    ]
+  },
+  {
+    "id": "cookie",
+    "title": "Bánh quy",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936",
+      "#C8E7DD"
+    ],
+    "rows": [
+      "0011100",
+      "0522210",
+      "1232321",
+      "1242421",
+      "1252523",
+      "0126210",
+      "0011100"
+    ],
+    "blockers": [
+      {
+        "type": "stone",
+        "index": 41
+      }
+    ]
+  },
+  {
+    "id": "gift",
+    "title": "Hộp quà",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936"
+    ],
+    "rows": [
+      "011110",
+      "012210",
+      "111111",
+      "133321",
+      "124421",
+      "115115"
+    ],
+    "blockers": [
+      {
+        "type": "lock",
+        "index": 35,
+        "unlockAfter": 1
+      },
+      {
+        "type": "lock",
+        "index": 1,
+        "unlockAfter": 1
+      }
+    ]
+  },
+  {
+    "id": "basket",
+    "title": "Giỏ mèo",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936",
+      "#C8E7DD"
+    ],
+    "rows": [
+      "0011100",
+      "0122210",
+      "1200021",
+      "1111115",
+      "1234321",
+      "0425210",
+      "0016100"
+    ],
+    "blockers": [
+      {
+        "type": "lock",
+        "index": 45,
+        "unlockAfter": 1
+      },
+      {
+        "type": "lock",
+        "index": 0,
+        "unlockAfter": 1
+      }
+    ]
+  },
+  {
+    "id": "toyfish",
+    "title": "Cá đồ chơi",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936",
+      "#C8E7DD",
+      "#FFF8EE"
+    ],
+    "rows": [
+      "00000000",
+      "00111001",
+      "06222111",
+      "12343211",
+      "12555211",
+      "01262113",
+      "00117001",
+      "00000040"
+    ],
+    "blockers": [
+      {
+        "type": "lock",
+        "index": 62,
+        "unlockAfter": 2
+      },
+      {
+        "type": "lock",
+        "index": 1,
+        "unlockAfter": 2
+      }
+    ]
+  },
+  {
+    "id": "sleepy",
+    "title": "Mèo ngủ",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936",
+      "#C8E7DD",
+      "#FFF8EE"
+    ],
+    "rows": [
+      "00000000",
+      "00100100",
+      "05211210",
+      "12333321",
+      "13343331",
+      "63533531",
+      "01366110",
+      "00177100"
+    ],
+    "blockers": [
+      {
+        "type": "lock",
+        "index": 60,
+        "unlockAfter": 2
+      },
+      {
+        "type": "lock",
+        "index": 0,
+        "unlockAfter": 2
+      }
+    ]
+  },
+  {
+    "id": "house",
+    "title": "Nhà mèo",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936",
+      "#C8E7DD",
+      "#FFF8EE"
+    ],
+    "rows": [
+      "00011000",
+      "00122100",
+      "01233230",
+      "12244221",
+      "11111115",
+      "01255210",
+      "01266210",
+      "07177110"
+    ],
+    "blockers": [
+      {
+        "type": "stone",
+        "index": 40
+      },
+      {
+        "type": "stone",
+        "index": 5
+      },
+      {
+        "type": "lock",
+        "index": 57,
+        "unlockAfter": 2
+      },
+      {
+        "type": "lock",
+        "index": 1,
+        "unlockAfter": 2
+      }
+    ]
+  },
+  {
+    "id": "hug",
+    "title": "Mèo ôm len",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936",
+      "#C8E7DD",
+      "#FFF8EE"
+    ],
+    "rows": [
+      "01000100",
+      "12101210",
+      "12312310",
+      "13444310",
+      "13555310",
+      "13666310",
+      "01377100",
+      "01100150"
+    ],
+    "blockers": [
+      {
+        "type": "stone",
+        "index": 48
+      },
+      {
+        "type": "stone",
+        "index": 60
+      },
+      {
+        "type": "lock",
+        "index": 62,
+        "unlockAfter": 2
+      },
+      {
+        "type": "lock",
+        "index": 0,
+        "unlockAfter": 2
+      }
+    ]
+  },
+  {
+    "id": "crown",
+    "title": "Mèo vương miện",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936",
+      "#C8E7DD",
+      "#FFF8EE"
+    ],
+    "rows": [
+      "02020200",
+      "05222200",
+      "01111100",
+      "01262100",
+      "12343210",
+      "42555210",
+      "01366100",
+      "00177100"
+    ],
+    "blockers": [
+      {
+        "type": "stone",
+        "index": 57
+      },
+      {
+        "type": "stone",
+        "index": 56
+      },
+      {
+        "type": "lock",
+        "index": 60,
+        "unlockAfter": 2
+      },
+      {
+        "type": "lock",
+        "index": 0,
+        "unlockAfter": 2
+      }
+    ]
+  },
+  {
+    "id": "twins",
+    "title": "Đôi mèo",
+    "palette": [
+      "#79C9BA",
+      "#474276",
+      "#FFB24A",
+      "#FFF0C9",
+      "#FF8FAD",
+      "#E77936",
+      "#C8E7DD",
+      "#FFF8EE"
+    ],
+    "rows": [
+      "01001000",
+      "12112100",
+      "52312310",
+      "14414410",
+      "12512510",
+      "01601610",
+      "01701710",
+      "01101130"
+    ],
+    "blockers": [
+      {
+        "type": "stone",
+        "index": 43
+      },
+      {
+        "type": "stone",
+        "index": 48
+      },
+      {
+        "type": "lock",
+        "index": 62,
+        "unlockAfter": 2
+      },
+      {
+        "type": "lock",
+        "index": 0,
+        "unlockAfter": 2
+      }
+    ]
+  }
+]
